@@ -4,7 +4,7 @@ if (!defined("PROCESSWIRE")) die();
 /**
  * ProcessGeoIP - Admin UI for GeoIP module
  *
- * @author Maxim Alex
+ * @author Maxim Semenov <maxim@smnv.org> (smnv.org)
  * @license MIT
  */
 class ProcessGeoIP extends Process implements Module
@@ -16,7 +16,7 @@ class ProcessGeoIP extends Process implements Module
             'version'  => 101,
             'summary'  => 'Admin UI for GeoIP module.',
             'author'   => 'Maxim Semenov',
-            'href'     => 'https://github.com/mxmsmnv/GeoIP',
+            'href'     => 'https://smnv.org',
             'singular' => true,
             'autoload' => false,
             'icon'     => 'globe',

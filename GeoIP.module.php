@@ -7,7 +7,7 @@ if (!defined("PROCESSWIRE")) die();
  * Detects country/region/city from visitor IP, allows user corrections,
  * logs lookups, and exposes geo data to templates for conditional content.
  *
- * @author Maxim Alex
+ * @author Maxim Semenov <maxim@smnv.org> (smnv.org)
  * @license MIT
  */
 class GeoIP extends WireData implements Module, ConfigurableModule
@@ -21,7 +21,7 @@ class GeoIP extends WireData implements Module, ConfigurableModule
             'version'  => 101,
             'summary'  => 'MaxMind GeoLite2-based geolocation. Country/region/city detection with user correction support and conditional content blocks.',
             'author'   => 'Maxim Semenov',
-            'href'     => 'https://github.com/mxmsmnv/GeoIP',
+            'href'     => 'https://smnv.org',
             'singular' => true,
             'autoload' => true,
             'icon'     => 'globe',

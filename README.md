@@ -2,10 +2,11 @@
 
 MaxMind GeoLite2-based geolocation module for ProcessWire. Detects country, region and city from the visitor IP, supports user corrections, logs lookups to the database, and exposes geo data to templates for conditional content.
 
-- **Author:** Maxim Semenov
-- **Website:** [smnv.org](https://smnv.org)
-- **Email:** maxim@smnv.org
 - **GitHub:** [github.com/mxmsmnv/GeoIP](https://github.com/mxmsmnv/GeoIP)
+
+**Author:** Maxim Semenov  
+**Website:** [smnv.org](https://smnv.org)  
+**Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
 
 If this project helps your work, consider supporting future development: [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or [smnv.org/sponsor](https://smnv.org/sponsor/).
 
