@@ -2,6 +2,8 @@
 
 MaxMind GeoLite2-based geolocation module for ProcessWire. Detects country, region and city from the visitor IP, supports user corrections, logs lookups to the database, and exposes geo data to templates for conditional content.
 
+![GeoIP](assets/GeoIP.png)
+
 - **GitHub:** [github.com/mxmsmnv/GeoIP](https://github.com/mxmsmnv/GeoIP)
 
 **Author:** Maxim Semenov  
