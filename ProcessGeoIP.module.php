@@ -13,7 +13,7 @@ class ProcessGeoIP extends Process implements Module
     {
         return [
             'title'    => 'ProcessGeoIP',
-            'version'  => 101,
+            'version'  => 102,
             'summary'  => 'Admin UI for GeoIP module.',
             'author'   => 'Maxim Semenov',
             'href'     => 'https://smnv.org',
@@ -93,9 +93,11 @@ class ProcessGeoIP extends Process implements Module
         $hasCity     = file_exists($geoipPath . 'GeoLite2-City.mmdb');
         $hasCnt      = file_exists($geoipPath . 'GeoLite2-Country.mmdb');
         $hasDb       = $hasCity || $hasCnt;
+        $httpFallbackReady = (bool) $geoip->get('http_fallback_enabled')
+            && (string) $geoip->get('ipgeolocation_api_key') !== '';
         $out         = '';
 
-        if (!$hasComposer) {
+        if (!$hasComposer && !$httpFallbackReady) {
             $out .= "<div class='uk-alert uk-alert-danger' style='margin-bottom:12px'>
                 <p><i class='fa fa-exclamation-circle'></i>
                 <strong>Composer package <code>geoip2/geoip2</code> not installed.</strong></p>
@@ -105,7 +107,7 @@ class ProcessGeoIP extends Process implements Module
             </div>";
         }
 
-        if (!$hasDb) {
+        if (!$hasDb && !$httpFallbackReady) {
             $out .= "<div class='uk-alert uk-alert-warning' style='margin-bottom:12px'>
                 <p><i class='fa fa-exclamation-triangle'></i>
                 <strong>No GeoLite2 database found.</strong></p>
@@ -114,6 +116,13 @@ class ProcessGeoIP extends Process implements Module
                     <li>Download <code>GeoLite2-City.mmdb</code> (recommended) or <code>GeoLite2-Country.mmdb</code></li>
                     <li>Upload to: <code>{$geoipPath}</code></li>
                 </ol>
+            </div>";
+        }
+
+        if ($httpFallbackReady && (!$hasComposer || !$hasDb)) {
+            $out .= "<div class='uk-alert uk-alert-primary' style='margin-bottom:12px'>
+                <p><i class='fa fa-cloud'></i>
+                Local MaxMind lookup is unavailable. IPGeolocation.io HTTPS fallback is active.</p>
             </div>";
         }
 
@@ -362,7 +371,7 @@ class ProcessGeoIP extends Process implements Module
         $ip  = $this->wire('input')->get->text('ip') ?: '';
         $out = $this->renderNav('lookup');
 
-        $out .= "<p class='description'>Look up geo data for any IP address using the installed GeoLite2 database.</p>";
+        $out .= "<p class='description'>Look up geo data using local MaxMind first and the configured HTTPS fallback when needed.</p>";
 
         $out .= "<form method='get' style='max-width:480px;margin-bottom:24px'>
             <input type='hidden' name='action' value='lookup'>
@@ -414,6 +423,7 @@ class ProcessGeoIP extends Process implements Module
             ],
             'Meta' => [
                 'ip'          => ['IP Address',       $data['ip']],
+                'source'      => ['Lookup Source',    $data['source'] ?? ''],
                 'corrected'   => ['User Corrected',   $data['corrected'] ? 'yes' : 'no'],
                 'status'      => ['Status',           $data['status']],
             ],

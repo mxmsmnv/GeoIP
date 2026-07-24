@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.2] - 2026-07-23
+
+### Added
+
+- Optional IPGeolocation.io HTTPS fallback with API key and configurable timeout.
+- Lookup `source` metadata for MaxMind, IPGeolocation.io and static fallback results.
+- `DOCUMENTATION.md` for complete setup, API reference and integration examples.
+
+### Changed
+
+- Split lookup providers, result normalization, persistence and correction widget rendering into focused classes under `src/`.
+- Reduced `README.md` to a concise project overview matching the Vox module style.
+- Local MaxMind lookup remains the first choice; static fallback values are applied only after local and HTTP providers fail.
+
 ## [1.0.1] - 2026-03-15
 
 ### Added
