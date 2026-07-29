@@ -17,17 +17,18 @@ final class GeoIPCorrectionWidget
         $variant = ($options['variant'] ?? '') === 'embedded' ? 'embedded' : 'floating';
         $id = preg_replace('/[^a-zA-Z0-9_-]+/', '-', (string)($options['id'] ?? 'geoip-widget'));
         $id = htmlspecialchars(trim((string)$id, '-') ?: 'geoip-widget', ENT_QUOTES);
+        $locationParts = array_filter([
+            trim((string)($geo['city'] ?? '')),
+            trim((string)($geo['region'] ?? '')),
+            trim((string)($geo['country'] ?? '')),
+        ]);
+        if (!$locationParts && trim((string)($geo['countryCode'] ?? '')) !== '') {
+            $locationParts[] = strtoupper(trim((string)$geo['countryCode']));
+        }
         $location = htmlspecialchars(
-            implode(', ', array_filter([
-                trim((string)($geo['city'] ?? '')),
-                trim((string)($geo['region'] ?? '')),
-                trim((string)($geo['country'] ?? '')),
-            ])),
+            $locationParts ? implode(', ', $locationParts) : 'Location unavailable',
             ENT_QUOTES
         );
-        if ($location === '') {
-            $location = 'Location unavailable';
-        }
 
         return <<<HTML
 <details id="{$id}" class="geoip-widget geoip-widget--{$variant}" data-geoip-widget>

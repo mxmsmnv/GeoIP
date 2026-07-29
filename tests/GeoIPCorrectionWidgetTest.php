@@ -29,4 +29,10 @@ assertWidget(str_contains($markup, 'data-geoip-form'), 'Correction form hook sho
 assertWidget(!str_contains($markup, 'style='), 'Widget markup should not contain inline presentation styles.');
 assertWidget(!str_contains($markup, '<script>'), 'Widget markup should not contain inline scripts.');
 
+$fallbackMarkup = $renderer->render(['countryCode' => 'US']);
+assertWidget(
+    str_contains($fallbackMarkup, '<span data-geoip-location>US</span>'),
+    'Country code should be used when the location name is unavailable.'
+);
+
 echo "GeoIP correction widget tests passed.\n";
