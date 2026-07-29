@@ -2,7 +2,11 @@
 
 final class GeoIPCorrectionWidget
 {
-    public function render(array $geo, string $endpoint = './?geoip_action=correct'): string
+    public function render(
+        array $geo,
+        string $endpoint = './?geoip_action=correct',
+        array $options = []
+    ): string
     {
         $country = htmlspecialchars($geo['country'] ?? '', ENT_QUOTES);
         $countryCode = htmlspecialchars($geo['countryCode'] ?? '', ENT_QUOTES);
@@ -10,37 +14,62 @@ final class GeoIPCorrectionWidget
         $regionCode = htmlspecialchars($geo['regionCode'] ?? '', ENT_QUOTES);
         $city = htmlspecialchars($geo['city'] ?? '', ENT_QUOTES);
         $endpoint = htmlspecialchars($endpoint, ENT_QUOTES);
+        $variant = ($options['variant'] ?? '') === 'embedded' ? 'embedded' : 'floating';
+        $id = preg_replace('/[^a-zA-Z0-9_-]+/', '-', (string)($options['id'] ?? 'geoip-widget'));
+        $id = htmlspecialchars(trim((string)$id, '-') ?: 'geoip-widget', ENT_QUOTES);
+        $location = htmlspecialchars(
+            implode(', ', array_filter([
+                trim((string)($geo['city'] ?? '')),
+                trim((string)($geo['region'] ?? '')),
+                trim((string)($geo['country'] ?? '')),
+            ])),
+            ENT_QUOTES
+        );
+        if ($location === '') {
+            $location = 'Location unavailable';
+        }
 
         return <<<HTML
-<div id="geoip-widget" style="position:fixed;bottom:16px;right:16px;z-index:9999;font-family:system-ui,sans-serif;font-size:13px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px 16px;box-shadow:0 4px 16px rgba(0,0,0,.12);max-width:280px">
-  <div style="font-weight:600;margin-bottom:6px">&#128205; Your location</div>
-  <div style="color:#555;margin-bottom:8px">{$country}, {$region}, {$city}</div>
-  <div id="geoip-form" style="display:none">
-    <input type="hidden" id="geoip-cc" value="{$countryCode}">
-    <input type="hidden" id="geoip-rc" value="{$regionCode}">
-    <div style="margin-bottom:4px"><input type="text" id="geoip-c" placeholder="Country" value="{$country}" style="width:100%;box-sizing:border-box;padding:4px 6px;border:1px solid #ccc;border-radius:4px"></div>
-    <div style="margin-bottom:4px"><input type="text" id="geoip-r" placeholder="Region/State" value="{$region}" style="width:100%;box-sizing:border-box;padding:4px 6px;border:1px solid #ccc;border-radius:4px"></div>
-    <div style="margin-bottom:8px"><input type="text" id="geoip-ci" placeholder="City" value="{$city}" style="width:100%;box-sizing:border-box;padding:4px 6px;border:1px solid #ccc;border-radius:4px"></div>
-    <button onclick="geoipSave()" style="background:#2d6df6;color:#fff;border:none;padding:5px 12px;border-radius:4px;cursor:pointer;margin-right:6px">Save</button>
-    <button onclick="document.getElementById('geoip-form').style.display='none'" style="background:#eee;border:none;padding:5px 10px;border-radius:4px;cursor:pointer">Cancel</button>
-  </div>
-  <div style="margin-top:6px">
-    <a href="#" onclick="document.getElementById('geoip-form').style.display='block';return false" style="color:#2d6df6;text-decoration:none;font-size:12px">Incorrect? Fix it</a>
-    &nbsp;&middot;&nbsp;
-    <a href="#" onclick="document.getElementById('geoip-widget').remove();return false" style="color:#aaa;text-decoration:none;font-size:12px">&#10005;</a>
-  </div>
-</div>
-<script>
-function geoipSave(){
-  var fd=new FormData();
-  fd.append('country',document.getElementById('geoip-c').value);
-  fd.append('country_code',document.getElementById('geoip-cc').value);
-  fd.append('region',document.getElementById('geoip-r').value);
-  fd.append('region_code',document.getElementById('geoip-rc').value);
-  fd.append('city',document.getElementById('geoip-ci').value);
-  fetch('{$endpoint}',{method:'POST',body:fd}).then(r=>r.json()).then(d=>{if(d.success)location.reload();});
-}
-</script>
+<details id="{$id}" class="geoip-widget geoip-widget--{$variant}" data-geoip-widget>
+  <summary class="geoip-widget__summary">
+    <svg class="geoip-widget__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"></path>
+      <circle cx="12" cy="10" r="2.5"></circle>
+    </svg>
+    <span class="geoip-widget__copy">
+      <strong>Your location</strong>
+      <span data-geoip-location>{$location}</span>
+    </span>
+    <span class="geoip-widget__change">Change</span>
+  </summary>
+  <form class="geoip-widget__form" action="{$endpoint}" method="post" data-geoip-form>
+    <label>
+      <span>Country</span>
+      <input type="text" name="country" value="{$country}" autocomplete="country-name">
+    </label>
+    <label>
+      <span>Country code</span>
+      <input type="text" name="country_code" value="{$countryCode}" maxlength="2" autocomplete="country">
+    </label>
+    <label>
+      <span>Region or state</span>
+      <input type="text" name="region" value="{$region}" autocomplete="address-level1">
+    </label>
+    <label>
+      <span>Region code</span>
+      <input type="text" name="region_code" value="{$regionCode}" maxlength="12">
+    </label>
+    <label class="geoip-widget__field--wide">
+      <span>City</span>
+      <input type="text" name="city" value="{$city}" autocomplete="address-level2">
+    </label>
+    <div class="geoip-widget__actions">
+      <button type="submit">Save location</button>
+      <button type="button" data-geoip-cancel>Cancel</button>
+    </div>
+    <p class="geoip-widget__status" role="status" aria-live="polite" data-geoip-status></p>
+  </form>
+</details>
 HTML;
     }
 }

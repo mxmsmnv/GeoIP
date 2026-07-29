@@ -26,7 +26,7 @@ class GeoIP extends WireData implements Module, ConfigurableModule
     {
         return [
             'title'    => 'GeoIP',
-            'version'  => 102,
+            'version'  => 110,
             'summary'  => 'IP geolocation with local MaxMind lookup, optional IPGeolocation.io fallback, user corrections, and conditional content helpers.',
             'author'   => 'Maxim Semenov',
             'href'     => 'https://smnv.org',
@@ -49,6 +49,7 @@ class GeoIP extends WireData implements Module, ConfigurableModule
     protected ?GeoIPLookupService $lookupService = null;
     protected ?GeoIPStore $store = null;
     protected ?GeoIPCorrectionWidget $correctionWidget = null;
+    protected bool $correctionWidgetAssetsRendered = false;
 
     // ── Install / uninstall ──────────────────────────────────────────────────
 
@@ -349,10 +350,41 @@ class GeoIP extends WireData implements Module, ConfigurableModule
         $event->return = str_replace('</body>', $this->renderCorrectionWidget($geo) . '</body>', $event->return);
     }
 
-    protected function renderCorrectionWidget(array $geo): string
+    /**
+     * Render a location correction control inside a site template.
+     *
+     * Templates retain control over placement while GeoIP owns detection,
+     * correction persistence, endpoint handling and accessible form markup.
+     */
+    public function renderLocationWidget(array $options = []): string
+    {
+        if (!$this->get('enable_embedded_widget')) return '';
+
+        $options['variant'] = 'embedded';
+        $endpoint = (string)($options['endpoint'] ?? './?geoip_action=correct');
+        unset($options['endpoint']);
+
+        return $this->renderCorrectionWidget($this->detect(), $endpoint, $options);
+    }
+
+    protected function renderCorrectionWidget(
+        array $geo,
+        string $endpoint = './?geoip_action=correct',
+        array $options = []
+    ): string
     {
         $this->correctionWidget ??= new GeoIPCorrectionWidget();
-        return $this->correctionWidget->render($geo);
+        $markup = $this->correctionWidget->render($geo, $endpoint, $options);
+        if ($this->correctionWidgetAssetsRendered) return $markup;
+
+        $this->correctionWidgetAssetsRendered = true;
+        $baseUrl = rtrim((string)$this->wire('config')->urls->siteModules, '/')
+            . '/GeoIP/assets/';
+        $version = self::getModuleInfo()['version'];
+
+        return '<link rel="stylesheet" href="' . $baseUrl . 'geoip-widget.css?v=' . $version . '">'
+            . '<script src="' . $baseUrl . 'geoip-widget.js?v=' . $version . '" defer></script>'
+            . $markup;
     }
 
     protected function createAssetsDir(): void

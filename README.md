@@ -20,6 +20,7 @@ If this project helps your work, consider supporting future development: [GitHub
 - Exposes `$geoip` in ProcessWire templates.
 - Includes `inCountry()`, `inRegion()`, `inCity()`, `showIf()` and `getField()` helpers.
 - Supports visitor-submitted location corrections.
+- Can render the correction control inside a site shell without enabling the automatic floating widget.
 - Can cache results in the session and log one lookup per IP per session.
 - Provides an admin area for lookup history, corrections and manual IP lookup.
 
@@ -44,6 +45,9 @@ echo $geoip->showIf(
     $page->northeast_banner,
     $page->national_banner
 );
+
+// Optional template-integrated location control.
+echo $geoip->renderLocationWidget(['id' => 'sidebar-location']);
 ```
 
 Local MaxMind lookup is preferred for speed and privacy. The HTTP fallback sends the visitor IP to IPGeolocation.io only when local lookup fails and the fallback is explicitly enabled.

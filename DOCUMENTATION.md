@@ -69,6 +69,7 @@ Go to **Modules → GeoIP**:
 | Enable lookup logging | Write each unique IP to `geoip_log` table (one entry per session) |
 | Log retention (days) | Auto-prune logs older than N days on demand. 0 = keep forever |
 | Show correction widget | Inject "Fix my location" widget on all frontend pages |
+| Enable template-integrated location widget | Allow templates to place the correction control with `renderLocationWidget()` |
 | Cache in session | Avoid repeated DB lookups per session — strongly recommended |
 | Enable IPGeolocation.io fallback | Try the HTTPS API after local MaxMind lookup fails |
 | IPGeolocation.io API key | Server-side API key used only by the fallback provider |
@@ -615,7 +616,17 @@ if ($stores->count()) {
 
 ## User location correction
 
-When **Show correction widget** is enabled, a small fixed widget appears on every frontend page. Visitors can click "Incorrect? Fix it", edit country/region/city, and save. The correction is stored per-IP in `geoip_corrections` and applied automatically on all subsequent requests.
+When **Show correction widget** is enabled, a small fixed widget appears on every frontend page. Visitors can open it, refine country, region, city and their codes, then save. The correction is stored per-IP in `geoip_corrections` and applied automatically on all subsequent requests.
+
+For a site-owned placement such as a sidebar, enable **template-integrated location widget** and keep the automatic option disabled:
+
+```php
+echo $geoip->renderLocationWidget([
+    'id' => 'sidebar-location',
+]);
+```
+
+The method returns accessible markup plus the shared widget assets. It returns an empty string while the integration setting is disabled, so templates do not need to duplicate module configuration logic.
 
 ### How it works
 

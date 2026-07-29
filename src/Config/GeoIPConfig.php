@@ -8,6 +8,7 @@ final class GeoIPConfig
             'enable_logging' => 1,
             'log_retention_days' => 90,
             'show_correction_widget' => 1,
+            'enable_embedded_widget' => 0,
             'session_cache' => 1,
             'http_fallback_enabled' => 0,
             'ipgeolocation_api_key' => '',
@@ -109,6 +110,14 @@ final class GeoIPConfig
         $field->label = 'Show "Fix my location" widget on frontend pages';
         $field->value = 1;
         $field->checked = !empty($data['show_correction_widget']);
+        $wrapper->add($field);
+
+        $field = $modules->get('InputfieldCheckbox');
+        $field->attr('name', 'enable_embedded_widget');
+        $field->label = 'Enable template-integrated location widget';
+        $field->description = 'Lets templates place the correction control with $geoip->renderLocationWidget(). This does not inject a floating widget.';
+        $field->value = 1;
+        $field->checked = !empty($data['enable_embedded_widget']);
         $wrapper->add($field);
 
         $field = $modules->get('InputfieldCheckbox');

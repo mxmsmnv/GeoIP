@@ -1,0 +1,128 @@
+.geoip-widget {
+  box-sizing: border-box;
+  color: #262626;
+  font: 400 0.875rem/1.4 system-ui, sans-serif;
+}
+
+.geoip-widget--floating {
+  position: fixed;
+  z-index: 9999;
+  right: 1rem;
+  bottom: 1rem;
+  width: min(20rem, calc(100vw - 2rem));
+  border: 1px solid #d6d6d6;
+  border-radius: 0.5rem;
+  background: #fff;
+  box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 12%);
+  padding: 0.75rem;
+}
+
+.geoip-widget__summary {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.625rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.geoip-widget__summary::-webkit-details-marker {
+  display: none;
+}
+
+.geoip-widget__icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.geoip-widget__copy {
+  display: grid;
+  min-width: 0;
+}
+
+.geoip-widget__copy > span {
+  overflow: hidden;
+  color: #5f5f5f;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.geoip-widget__change {
+  color: #4f2840;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.geoip-widget__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #d6d6d6;
+}
+
+.geoip-widget__form label,
+.geoip-widget__form label > span {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.geoip-widget__form label > span {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.geoip-widget__form input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 2.5rem;
+  border: 1px solid #8a8a8a;
+  border-radius: 0.25rem;
+  background: #fff;
+  color: #262626;
+  font: inherit;
+  padding: 0.5rem;
+}
+
+.geoip-widget__field--wide,
+.geoip-widget__actions,
+.geoip-widget__status {
+  grid-column: 1 / -1;
+}
+
+.geoip-widget__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.geoip-widget__actions button {
+  min-height: 2.5rem;
+  border: 1px solid #4f2840;
+  border-radius: 0.25rem;
+  background: #4f2840;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+}
+
+.geoip-widget__actions button[data-geoip-cancel] {
+  background: transparent;
+  color: #4f2840;
+}
+
+.geoip-widget__actions button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.geoip-widget__status {
+  min-height: 1lh;
+  margin: 0;
+  color: #5f5f5f;
+  font-size: 0.75rem;
+}
