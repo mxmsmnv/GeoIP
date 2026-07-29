@@ -46,7 +46,7 @@ echo $geoip->showIf(
     $page->national_banner
 );
 
-// Optional template-integrated location control.
+// Optional compact control that opens a location confirmation dialog.
 echo $geoip->renderLocationWidget(['id' => 'sidebar-location']);
 ```
 

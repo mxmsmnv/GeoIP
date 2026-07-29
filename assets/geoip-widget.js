@@ -1,10 +1,29 @@
 (() => {
   document.addEventListener('click', (event) => {
+    const edit = event.target.closest('[data-geoip-edit]');
+    if (edit) {
+      const widget = edit.closest('[data-geoip-widget]');
+      const confirmation = widget?.querySelector('[data-geoip-confirmation]');
+      const form = widget?.querySelector('[data-geoip-form]');
+      if (confirmation && form) {
+        confirmation.hidden = true;
+        form.hidden = false;
+        form.querySelector('input')?.focus();
+      }
+      return;
+    }
+
     const cancel = event.target.closest('[data-geoip-cancel]');
     if (!cancel) return;
 
     const widget = cancel.closest('[data-geoip-widget]');
-    if (widget) widget.open = false;
+    const confirmation = widget?.querySelector('[data-geoip-confirmation]');
+    const form = widget?.querySelector('[data-geoip-form]');
+    if (confirmation && form) {
+      form.hidden = true;
+      confirmation.hidden = false;
+      widget.querySelector('[data-geoip-edit]')?.focus();
+    }
   });
 
   document.addEventListener('submit', async (event) => {

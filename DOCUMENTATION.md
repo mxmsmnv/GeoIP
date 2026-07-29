@@ -626,13 +626,13 @@ echo $geoip->renderLocationWidget([
 ]);
 ```
 
-The method returns accessible markup plus the shared widget assets. It returns an empty string while the integration setting is disabled, so templates do not need to duplicate module configuration logic.
+The method returns a compact location row, a native `<dialog>` using Designsystemet-compatible classes and command attributes, plus the shared widget assets. Visitors can confirm the detected location or open the editable correction form. It returns an empty string while the integration setting is disabled, so templates do not need to duplicate module configuration logic.
 
 ### How it works
 
 1. Visitor lands on the site — geo detected from IP automatically
-2. Widget shows detected location in bottom-right corner
-3. Visitor clicks "Incorrect? Fix it" and edits the fields
+2. Widget shows the detected city in its configured placement
+3. Visitor opens the dialog, confirms the location or chooses another one
 4. On save: correction stored in DB, session cleared, page reloads
 5. All future requests from that IP use the corrected values
 

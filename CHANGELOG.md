@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.2.0] - 2026-07-29
+
+### Changed
+
+- The embedded location widget is now a compact city row that opens a Designsystemet-compatible native dialog.
+- Visitors can confirm the detected location or reveal the correction form to choose another one.
+- The dialog uses native command controls, accessible labeling, focused editing and responsive form layout.
+
 ## [1.1.0] - 2026-07-29
 
 ### Added

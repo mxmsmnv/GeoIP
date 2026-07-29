@@ -17,75 +17,89 @@
   padding: 0.75rem;
 }
 
-.geoip-widget__summary {
+.geoip-widget__trigger {
   display: grid;
   grid-template-columns: 1.5rem minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.625rem;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
   cursor: pointer;
-  list-style: none;
+  font: inherit;
+  text-align: left;
 }
 
-.geoip-widget__summary::-webkit-details-marker {
-  display: none;
-}
-
-.geoip-widget__icon {
+.geoip-widget__icon,
+.geoip-widget__arrow {
   width: 1.5rem;
   height: 1.5rem;
 }
 
-.geoip-widget__copy {
-  display: grid;
+.geoip-widget__location {
   min-width: 0;
-}
-
-.geoip-widget__copy > span {
   overflow: hidden;
-  color: #5f5f5f;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.geoip-widget__change {
-  color: #4f2840;
-  font-size: 0.75rem;
-  font-weight: 600;
+.geoip-widget__dialog {
+  width: min(36rem, calc(100vw - 2rem));
+}
+
+.geoip-widget__dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.geoip-widget__dialog-header > div,
+.geoip-widget__confirmation,
+.geoip-widget__detected {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.geoip-widget__close svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.geoip-widget__detected {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.geoip-widget__detected-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.geoip-widget__detected > div {
+  display: grid;
+  gap: 0.125rem;
 }
 
 .geoip-widget__form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.625rem;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid #d6d6d6;
 }
 
-.geoip-widget__form label,
-.geoip-widget__form label > span {
+.geoip-widget__form[hidden],
+.geoip-widget__confirmation[hidden] {
+  display: none;
+}
+
+.geoip-widget__form label {
   display: grid;
   gap: 0.25rem;
 }
 
-.geoip-widget__form label > span {
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.geoip-widget__form input {
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-  min-height: 2.5rem;
-  border: 1px solid #8a8a8a;
-  border-radius: 0.25rem;
-  background: #fff;
-  color: #262626;
-  font: inherit;
-  padding: 0.5rem;
-}
-
+.geoip-widget__form-intro,
 .geoip-widget__field--wide,
 .geoip-widget__actions,
 .geoip-widget__status {
@@ -98,23 +112,6 @@
   gap: 0.5rem;
 }
 
-.geoip-widget__actions button {
-  min-height: 2.5rem;
-  border: 1px solid #4f2840;
-  border-radius: 0.25rem;
-  background: #4f2840;
-  color: #fff;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 600;
-  padding: 0.5rem 0.75rem;
-}
-
-.geoip-widget__actions button[data-geoip-cancel] {
-  background: transparent;
-  color: #4f2840;
-}
-
 .geoip-widget__actions button:disabled {
   cursor: wait;
   opacity: 0.6;
@@ -125,4 +122,19 @@
   margin: 0;
   color: #5f5f5f;
   font-size: 0.75rem;
+}
+
+@media (max-width: 34rem) {
+  .geoip-widget__form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .geoip-widget__form > * {
+    grid-column: 1;
+  }
+
+  .geoip-widget__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }

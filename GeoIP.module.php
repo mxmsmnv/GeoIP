@@ -26,7 +26,7 @@ class GeoIP extends WireData implements Module, ConfigurableModule
     {
         return [
             'title'    => 'GeoIP',
-            'version'  => 110,
+            'version'  => 120,
             'summary'  => 'IP geolocation with local MaxMind lookup, optional IPGeolocation.io fallback, user corrections, and conditional content helpers.',
             'author'   => 'Maxim Semenov',
             'href'     => 'https://smnv.org',
