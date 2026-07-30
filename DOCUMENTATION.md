@@ -878,5 +878,8 @@ echo $geoip->renderLocationWidget([
 ]);
 ```
 
-The cached document contains a stable placeholder. The visitor-specific city,
-correction form, and CSRF token are returned by a private/no-store request.
+The cached document contains a stable placeholder. The visitor-specific city
+and correction form are returned by a private/no-store request that explicitly
+does not retain a ProcessWire session cookie. A CSRF token is requested only
+after the visitor submits a correction, so merely viewing the location does not
+make subsequent navigation bypass a session-aware edge cache.

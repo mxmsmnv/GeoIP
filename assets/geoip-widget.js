@@ -60,6 +60,24 @@
     if (status) status.textContent = 'Saving…';
 
     try {
+      if (!form.querySelector('[data-geoip-csrf-token]')) {
+        const tokenResponse = await fetch(form.dataset.geoipCsrfUrl, {
+          credentials: 'same-origin',
+          headers: { Accept: 'application/json' },
+          cache: 'no-store',
+        });
+        const token = await tokenResponse.json();
+        if (!tokenResponse.ok || !token.success || !token.name || !token.value) {
+          throw new Error('Unable to start a secure location update.');
+        }
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = token.name;
+        csrfInput.value = token.value;
+        csrfInput.dataset.geoipCsrfToken = '1';
+        form.append(csrfInput);
+      }
+
       const response = await fetch(form.action, {
         method: 'POST',
         body: new FormData(form),

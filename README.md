@@ -21,6 +21,7 @@ If this project helps your work, consider supporting future development: [GitHub
 - Includes `inCountry()`, `inRegion()`, `inCity()`, `showIf()` and `getField()` helpers.
 - Supports visitor-submitted location corrections.
 - Can render the correction control inside a site shell without enabling the automatic floating widget.
+- Supports a session-free deferred widget for CloudCache and other full-page caches.
 - Can cache results in the session and log one lookup per IP per session.
 - Provides an admin area for lookup history, corrections and manual IP lookup.
 

@@ -38,6 +38,10 @@ final class GeoIPCorrectionWidget
             ENT_QUOTES
         );
         $csrfInput = (string)($options['csrf_input'] ?? '');
+        $csrfUrl = htmlspecialchars(
+            (string)($options['csrf_url'] ?? '/?geoip_action=csrf'),
+            ENT_QUOTES
+        );
 
         return <<<HTML
 <div id="{$id}" class="geoip-widget geoip-widget--{$variant}" data-geoip-widget>
@@ -80,7 +84,7 @@ final class GeoIPCorrectionWidget
         </div>
       </div>
 
-      <form class="geoip-widget__form" action="{$endpoint}" method="post" data-geoip-form hidden>
+      <form class="geoip-widget__form" action="{$endpoint}" method="post" data-geoip-form data-geoip-csrf-url="{$csrfUrl}" hidden>
         {$csrfInput}
         <p class="ds-paragraph geoip-widget__form-intro" data-size="sm">Enter the most useful location for your LQRS experience.</p>
         <label class="ds-field">

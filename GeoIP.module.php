@@ -26,7 +26,7 @@ class GeoIP extends WireData implements Module, ConfigurableModule
     {
         return [
             'title'    => 'GeoIP',
-            'version'  => 130,
+            'version'  => 131,
             'summary'  => 'IP geolocation with local MaxMind lookup, optional IPGeolocation.io fallback, user corrections, and conditional content helpers.',
             'author'   => 'Maxim Semenov',
             'href'     => 'https://smnv.org',
@@ -333,12 +333,34 @@ class GeoIP extends WireData implements Module, ConfigurableModule
 
             $id = $this->wire('sanitizer')->name((string) $input->get('widget_id')) ?: 'geoip-widget';
             $variant = (string) $input->get('variant') === 'floating' ? 'floating' : 'embedded';
-            echo json_encode([
+            $payload = json_encode([
                 'success' => true,
                 'html' => $this->renderCorrectionMarkup($this->detect(), '/?geoip_action=correct', [
                     'id' => $id,
                     'variant' => $variant,
+                    'defer_csrf' => true,
+                    'csrf_url' => '/?geoip_action=csrf',
                 ]),
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            // A read-only fragment must not turn an anonymous visitor into a
+            // ProcessWire session user, otherwise CloudCache will correctly
+            // bypass every subsequent request because of the wire(s) cookie.
+            header_remove('Set-Cookie');
+            echo $payload;
+            exit;
+        }
+
+        if ($action === 'csrf' && $input->requestMethod('GET')) {
+            $this->wire('config')->ajax = true;
+            header('Content-Type: application/json; charset=utf-8');
+            header('Cache-Control: private, no-store, no-cache, must-revalidate');
+            header('Pragma: no-cache');
+
+            $csrf = $this->wire('session')->CSRF;
+            echo json_encode([
+                'success' => true,
+                'name' => $csrf->getTokenName(),
+                'value' => $csrf->getTokenValue(),
             ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             exit;
         }
@@ -419,7 +441,11 @@ class GeoIP extends WireData implements Module, ConfigurableModule
     ): string
     {
         $this->correctionWidget ??= new GeoIPCorrectionWidget();
-        $options['csrf_input'] = $this->wire('session')->CSRF->renderInput();
+        if (!empty($options['defer_csrf'])) {
+            $options['csrf_input'] = '';
+        } else {
+            $options['csrf_input'] = $this->wire('session')->CSRF->renderInput();
+        }
         return $this->correctionWidget->render($geo, $endpoint, $options);
     }
 

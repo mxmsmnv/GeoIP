@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.3.1] - 2026-07-30
+
+### Fixed
+
+- Deferred location fragments no longer emit ProcessWire session cookies, so
+  anonymous navigation remains eligible for CloudCache after location loads.
+- CSRF tokens are now requested only when a visitor submits a correction. The
+  correction flow remains protected without creating a session during normal
+  page views.
+
 ## [1.3.0] - 2026-07-30
 
 ### Added
