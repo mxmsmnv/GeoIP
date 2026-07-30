@@ -866,3 +866,17 @@ MaxMind updates GeoLite2 databases on the first Tuesday of each month. To update
 ## CHANGELOG
 
 See [CHANGELOG.md](CHANGELOG.md).
+### Full-page cache compatibility
+
+When a page may be stored by CloudCache, ProCache, or a reverse proxy, render
+the embedded widget in deferred mode:
+
+```php
+echo $geoip->renderLocationWidget([
+    'id' => 'sidebar-location',
+    'defer' => true,
+]);
+```
+
+The cached document contains a stable placeholder. The visitor-specific city,
+correction form, and CSRF token are returned by a private/no-store request.

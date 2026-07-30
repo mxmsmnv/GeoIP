@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.3.0] - 2026-07-30
+
+### Added
+
+- Added deferred embedded widgets through
+  `renderLocationWidget(['defer' => true])`. Cacheable HTML contains only a
+  stable placeholder; visitor-specific location and a current CSRF token load
+  from a private/no-store fragment endpoint.
+
+### Fixed
+
+- Location correction now validates ProcessWire CSRF tokens.
+- Fragment and correction responses explicitly disable shared caching.
+- Aligned the frontend and Process module release versions.
+
 ## [1.2.0] - 2026-07-29
 
 ### Changed

@@ -1,4 +1,27 @@
 (() => {
+  async function loadFragment(host) {
+    if (host.dataset.geoipFragmentLoading) return;
+    host.dataset.geoipFragmentLoading = '1';
+    try {
+      const response = await fetch(host.dataset.geoipFragmentUrl, {
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json' },
+        cache: 'no-store',
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success || !result.html) {
+        throw new Error('Location unavailable');
+      }
+      host.innerHTML = result.html;
+      host.removeAttribute('data-geoip-fragment-loading');
+    } catch (error) {
+      const status = host.querySelector('.geoip-widget-fragment__status');
+      if (status) status.textContent = 'Choose location';
+    }
+  }
+
+  document.querySelectorAll('[data-geoip-fragment]').forEach(loadFragment);
+
   document.addEventListener('click', (event) => {
     const edit = event.target.closest('[data-geoip-edit]');
     if (edit) {

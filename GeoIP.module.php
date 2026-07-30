@@ -26,7 +26,7 @@ class GeoIP extends WireData implements Module, ConfigurableModule
     {
         return [
             'title'    => 'GeoIP',
-            'version'  => 120,
+            'version'  => 130,
             'summary'  => 'IP geolocation with local MaxMind lookup, optional IPGeolocation.io fallback, user corrections, and conditional content helpers.',
             'author'   => 'Maxim Semenov',
             'href'     => 'https://smnv.org',
@@ -72,7 +72,7 @@ class GeoIP extends WireData implements Module, ConfigurableModule
         // Make $geoip available in all templates
         $this->wire->set('geoip', $this);
 
-        // Handle correction POST endpoint
+        // Handle correction and cache-safe fragment endpoints.
         $this->addHookBefore('ProcessPageView::execute', $this, 'handleCorrectionRequest');
 
         // Inject frontend correction widget if enabled
@@ -323,10 +323,37 @@ class GeoIP extends WireData implements Module, ConfigurableModule
     public function handleCorrectionRequest(HookEvent $event): void
     {
         $input = $this->wire('input');
-        if ($input->get('geoip_action') !== 'correct') return;
-        if (!$input->requestMethod('POST')) return;
+        $action = (string) $input->get('geoip_action');
+
+        if ($action === 'fragment' && $input->requestMethod('GET')) {
+            $this->wire('config')->ajax = true;
+            header('Content-Type: application/json; charset=utf-8');
+            header('Cache-Control: private, no-store, no-cache, must-revalidate');
+            header('Pragma: no-cache');
+
+            $id = $this->wire('sanitizer')->name((string) $input->get('widget_id')) ?: 'geoip-widget';
+            $variant = (string) $input->get('variant') === 'floating' ? 'floating' : 'embedded';
+            echo json_encode([
+                'success' => true,
+                'html' => $this->renderCorrectionMarkup($this->detect(), '/?geoip_action=correct', [
+                    'id' => $id,
+                    'variant' => $variant,
+                ]),
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        if ($action !== 'correct' || !$input->requestMethod('POST')) return;
 
         header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: private, no-store, no-cache, must-revalidate');
+        header('Pragma: no-cache');
+
+        if (!$this->wire('session')->CSRF->hasValidToken()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
+            exit;
+        }
 
         $post = $input->post;
         $ok   = $this->saveCorrection([
@@ -346,8 +373,11 @@ class GeoIP extends WireData implements Module, ConfigurableModule
     public function injectCorrectionWidget(HookEvent $event): void
     {
         if ($this->wire('page')->template == 'admin') return;
-        $geo           = $this->detect();
-        $event->return = str_replace('</body>', $this->renderCorrectionWidget($geo) . '</body>', $event->return);
+        $widget = $this->renderDeferredLocationWidget([
+            'id' => 'geoip-floating',
+            'variant' => 'floating',
+        ]);
+        $event->return = str_replace('</body>', $widget . '</body>', $event->return);
     }
 
     /**
@@ -359,6 +389,11 @@ class GeoIP extends WireData implements Module, ConfigurableModule
     public function renderLocationWidget(array $options = []): string
     {
         if (!$this->get('enable_embedded_widget')) return '';
+
+        if (!empty($options['defer'])) {
+            $options['variant'] = 'embedded';
+            return $this->renderDeferredLocationWidget($options);
+        }
 
         $options['variant'] = 'embedded';
         $endpoint = (string)($options['endpoint'] ?? './?geoip_action=correct');
@@ -373,9 +408,39 @@ class GeoIP extends WireData implements Module, ConfigurableModule
         array $options = []
     ): string
     {
+        $markup = $this->renderCorrectionMarkup($geo, $endpoint, $options);
+        return $this->renderWidgetAssets() . $markup;
+    }
+
+    protected function renderCorrectionMarkup(
+        array $geo,
+        string $endpoint,
+        array $options = []
+    ): string
+    {
         $this->correctionWidget ??= new GeoIPCorrectionWidget();
-        $markup = $this->correctionWidget->render($geo, $endpoint, $options);
-        if ($this->correctionWidgetAssetsRendered) return $markup;
+        $options['csrf_input'] = $this->wire('session')->CSRF->renderInput();
+        return $this->correctionWidget->render($geo, $endpoint, $options);
+    }
+
+    protected function renderDeferredLocationWidget(array $options): string
+    {
+        $id = $this->wire('sanitizer')->name((string)($options['id'] ?? 'geoip-widget')) ?: 'geoip-widget';
+        $variant = ($options['variant'] ?? '') === 'floating' ? 'floating' : 'embedded';
+        $fragmentUrl = '/?geoip_action=fragment&widget_id=' . rawurlencode($id)
+            . '&variant=' . rawurlencode($variant);
+        $placeholder = '<div class="geoip-widget-fragment" data-geoip-fragment'
+            . ' data-geoip-fragment-url="' . htmlspecialchars($fragmentUrl, ENT_QUOTES) . '"'
+            . ' aria-live="polite">'
+            . '<span class="geoip-widget-fragment__status">Loading location…</span>'
+            . '</div>';
+
+        return $this->renderWidgetAssets() . $placeholder;
+    }
+
+    protected function renderWidgetAssets(): string
+    {
+        if ($this->correctionWidgetAssetsRendered) return '';
 
         $this->correctionWidgetAssetsRendered = true;
         $baseUrl = rtrim((string)$this->wire('config')->urls->siteModules, '/')
@@ -383,8 +448,7 @@ class GeoIP extends WireData implements Module, ConfigurableModule
         $version = self::getModuleInfo()['version'];
 
         return '<link rel="stylesheet" href="' . $baseUrl . 'geoip-widget.css?v=' . $version . '">'
-            . '<script src="' . $baseUrl . 'geoip-widget.js?v=' . $version . '" defer></script>'
-            . $markup;
+            . '<script src="' . $baseUrl . 'geoip-widget.js?v=' . $version . '" defer></script>';
     }
 
     protected function createAssetsDir(): void
