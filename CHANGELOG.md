@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.3.2] - 2026-08-08
+
+### Fixed
+
+- Restored the frontend location widget to the standard 1rem interface type
+  size and a readable 1.5 line height, including its confirmation dialog.
+
 ## [1.3.1] - 2026-07-30
 
 ### Fixed

@@ -1,7 +1,7 @@
 .geoip-widget {
   box-sizing: border-box;
   color: #262626;
-  font: 400 0.875rem/1.4 system-ui, sans-serif;
+  font: 400 1rem/1.5 system-ui, sans-serif;
 }
 
 .geoip-widget--floating {

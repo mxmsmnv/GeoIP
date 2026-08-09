@@ -13,7 +13,7 @@ class ProcessGeoIP extends Process implements Module
     {
         return [
             'title'    => 'ProcessGeoIP',
-            'version'  => 131,
+            'version'  => 132,
             'summary'  => 'Admin UI for GeoIP module.',
             'author'   => 'Maxim Semenov',
             'href'     => 'https://smnv.org',
