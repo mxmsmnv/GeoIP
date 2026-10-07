@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.3.3] - 2026-10-07
+
+### Added
+
+- Added the MIT license file.
+- Added `AGENTS.md` and `API.md` with Olivia-ready site-building guidance,
+  safety boundaries and the complete public API contract.
+
+### Changed
+
+- Split detection, frontend endpoint/widget and runtime-path responsibilities
+  into focused traits under `src/Traits/` while preserving the public API.
+- Documented the lazy performance model: module autoload registers the API
+  variable and hooks, while providers and lookup work start only on demand.
+- Reworked the README around the current implementation, privacy model,
+  caching behavior, installation paths and sponsorship links.
+
 ## [1.3.2] - 2026-08-08
 
 ### Fixed

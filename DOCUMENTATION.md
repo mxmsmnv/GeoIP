@@ -78,20 +78,26 @@ Go to **Modules → GeoIP**:
 
 ## How it works
 
-On every frontend request the module:
+The module autoloads so `$geoip` and the widget endpoints are available on
+frontend requests. Autoloading itself does not open a database or detect the
+visitor. Lookup starts only when a template calls a location helper, an admin
+lookup supplies an IP, or a widget fragment requests visitor data.
 
-1. Checks in-memory cache — if already detected this request, returns immediately
-2. Checks session cache — if already detected this session, returns from session
-3. Resolves the real client IP (handles Cloudflare, proxies, load balancers)
-4. Looks up the IP in the local MaxMind GeoLite2 database
-5. If local lookup fails and HTTP fallback is enabled, calls IPGeolocation.io over HTTPS
-6. If both providers fail, applies configured static fallback values
-7. Checks for a saved user correction for this IP and applies it
-8. Saves the result to session cache
-9. Logs the lookup to `geoip_log` (one entry per unique IP per session)
-10. Returns the geo data array
+For the current visitor, GeoIP then:
 
-The `$geoip` variable is registered as a wire variable — available in all templates automatically, just like `$page`, `$user`, `$config`.
+1. Checks the in-memory cache and returns immediately when this request already detected a location.
+2. Checks the optional session cache.
+3. Resolves the client IP from supported proxy headers and `REMOTE_ADDR`.
+4. Looks up the IP in the local MaxMind GeoLite2 database.
+5. Calls IPGeolocation.io only when local lookup fails and the HTTP fallback is enabled.
+6. Applies configured static fallback fields when both providers fail; the result status remains `fail`.
+7. Applies any saved correction for this IP.
+8. Saves the result to the optional session cache.
+9. Logs the lookup when logging is enabled, at most once per IP per session.
+10. Returns the geo data array.
+
+The `$geoip` variable is available in templates automatically, just like
+`$page`, `$user` and `$config`.
 
 ---
 
